@@ -94,10 +94,12 @@ def get_message(message_text = None):
 
 
 
-def is_greetings(message_text = None):
+def is_greetings(message_text = None, audio_resp = None):
     greetings = False
     if message_text is not None:
         wit_response = client.message(message_text)
+    elif audio_resp is not None:
+        wit_response = audio_resp
     else:
         return None
     for trait in wit_response['traits']:
@@ -107,9 +109,11 @@ def is_greetings(message_text = None):
 
     return greetings
 # print(is_greetings(""))
-def get_emotion(message_text = None):
+def get_emotion(message_text = None, audio_resp = None):
     if message_text is not None:
         wit_response = client.message(message_text)
+    elif audio_resp is not None:
+        wit_response = audio_resp
     else:
         return (None,None)
     isemotion = search_object(wit_response['entities'],'get_emotion:get_emotion')
@@ -118,9 +122,11 @@ def get_emotion(message_text = None):
     return (emotion,emotion_conf)
 
 
-def get_context(message_text = None):
+def get_context(message_text = None, audio_resp = None):
     if message_text is not None:
         wit_response = client.message(message_text)
+    elif audio_resp is not None:
+        wit_response = audio_resp
     else:
         return (None,None)
     # print(wit_response)
@@ -129,15 +135,24 @@ def get_context(message_text = None):
     context_conf = first_confidence(wit_response['entities'],'get_context:context') if iscontext else None
     return (context,context_conf)
 
-def get_sentiment(message_text = None):
+def get_sentiment(message_text = None, audio_resp = None):
     if message_text is not None:
         wit_response = client.message(message_text)
+    elif audio_resp is not None:
+        wit_response = audio_resp
     else:
         return (None,None)
     issentiment = search_object(wit_response['traits'],'wit$sentiment')
     sentiment = first_value(wit_response['traits'],'wit$sentiment') if issentiment else None
     sentiment_conf = first_confidence(wit_response['traits'],'wit$sentiment') if issentiment else None
     return (sentiment,sentiment_conf)
+
+def get_audio_response(audio_link = None):
+    resp = None
+    if audio_link is not None:
+        with open(audio_link,'rb') as f:
+            resp = client.speech(f.read(),{'Content-Type': 'audio/wav'})
+    return resp
 
 
 def handle_greetings():
