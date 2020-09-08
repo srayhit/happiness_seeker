@@ -1,7 +1,11 @@
 import os, sys
+# from utils import wit_response
+
+import utils as ut
 
 from flask import Flask, request
 from pymessenger import Bot
+import activityClient as ac
 
 app = Flask(__name__)
 
@@ -35,12 +39,59 @@ def webhook():
                     if 'text' in messaging_event['message']:
                         messaging_text = messaging_event['message']['text']
                     else:
-                        messaging_text = 'no text'
+                        print("No message")
+                        messaging_text = None
                     
                     #ECHO
-                    response = messaging_text
+                    print(messaging_text)   
+                    # response = messaging_text
+                    if messaging_text is not None:
 
-                    bot.send_text_message(sender_id,response)
+                        greetings = ut.is_greetings(messaging_text)
+                        # print(greetings)
+                        if greetings:
+                            response = ut.handle_greetings()
+                            print(response)
+                            bot.send_text_message(sender_id,response)
+                        else:
+                            emot , emotconf = ut.get_emotion(messaging_text)
+                            sent , sentconf = ut.get_sentiment(messaging_text)
+                            cont, contconf = ut.get_context(messaging_text)
+                            # print(emot,sent,cont)
+
+
+                            util_resp = ut.handle_response(emot,sent,emotconf,sentconf)
+                            action_resp = ut.generate_action(util_resp,cont,contconf)
+                            act_list = action_resp
+                            share_var = False
+                            partner_var = False
+                            if 'share' in act_list:
+                                share_var = True
+                            if 'partner' in act_list:
+                                partner_var = True
+                            
+
+                            elements = ac.get_element(action_resp)
+                            resp_emot = ac.get_emotion_response(util_resp)
+                            default_text = "These are my suggestions"
+                            response = resp_emot + "\n" + default_text
+                            
+
+                            bot.send_text_message(sender_id,response)
+                            if elements :
+                                bot.send_generic_message(sender_id,elements)
+
+                            if share_var:
+                                # print('here')
+                                bot.send_text_message(sender_id,'You can also share your achievement on you wall!')
+                            if partner_var:
+                                # print('here')
+                                bot.send_text_message(sender_id,'You can also call your partner')
+
+                    
+                    
+
+                    # bot.send_text_message(sender_id,response)
 
 
     return "ok", 200
