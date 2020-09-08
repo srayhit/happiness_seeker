@@ -12,6 +12,7 @@ Jinja2==2.11.2
 lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
 mccabe==0.6.1
+prompt-toolkit==3.0.7
 pylint==2.6.0
 pymessenger==0.0.7.0
 requests==2.24.0
@@ -20,6 +21,8 @@ six==1.15.0
 toml==0.10.1
 typed-ast==1.4.1
 urllib3==1.25.10
+wcwidth==0.2.5
 Werkzeug==1.0.1
 wincertstore==0.2
+wit==6.0.0
 wrapt==1.12.1
